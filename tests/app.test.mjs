@@ -385,10 +385,10 @@ test('ピアノ版はハ長調440Hzで、確認音なしで開始する', async(
  submit(h);await flushAsync();assert.equal(h.document.getElementById('practice-screen').hidden,false);
  holdMidi(h,60);assert.equal(h.document.getElementById('companion').getAttribute('data-reaction'),'happy');h.app.destroy();
 });
-test('違うオクターブのドは不正解で、ド5と表示する',async()=>{
+test('違うオクターブのドは不正解で、高いドと表示する',async()=>{
  const h=createHarness();await startMicPractice(h);holdMidi(h,72);
  assert.equal(h.document.getElementById('companion').getAttribute('data-reaction'),'miss');
- assert.match(h.document.getElementById('companion-words').textContent,/ド5/);h.app.destroy();
+ assert.match(h.document.getElementById('companion-words').textContent,/高いド/);h.app.destroy();
 });
 test('正解の持続音は次へ二重に進まず、不正解も弾き直すまで残る',async()=>{
  const h=createHarness();await startMicPractice(h);holdMidi(h,60);h.clock.advance(400);holdMidi(h,60);
@@ -400,8 +400,8 @@ test('正解の持続音は次へ二重に進まず、不正解も弾き直す�
 });
 test('ヒントは音名の次に鍵盤位置を示す',async()=>{
  const h=createHarness();await startManualPractice(h);
- h.document.getElementById('hint-button').click();assert.match(h.document.getElementById('hint-name').textContent,/ド4/);
- h.document.getElementById('hint-button').click();assert.match(h.document.getElementById('keyboard-hint').innerHTML,/ド4の鍵盤位置/);h.app.destroy();
+ h.document.getElementById('hint-button').click();assert.match(h.document.getElementById('hint-name').textContent,/普通のド/);
+ h.document.getElementById('hint-button').click();assert.match(h.document.getElementById('keyboard-hint').innerHTML,/普通のドの鍵盤位置/);h.app.destroy();
 });
 test('全12音のマイク正解後に結果へ進み資源を解放する',async()=>{
  const h=createHarness();await startMicPractice(h);await passWholeSession(h,DEFAULT_PHRASES);

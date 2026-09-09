@@ -81,7 +81,7 @@ export function keySignature(key) {
   return TREBLE_SHARP_POSITIONS.slice(0, KEYS[key].sharps)
     .map(position => ({...position}));
 }
-export function noteLabel(midi) { return `${noteNameJa(midi)}${Math.floor(midi/12)-1}`; }
+export function noteLabel(midi) { return `${midi<60?'低い':midi<72?'普通の':midi<84?'高い':'すごく高い'}${noteNameJa(midi)}`; }
 export function scaleMidis(low, high, key='C') {
   const pcs=scalePcs(key);
   return Array.from({length:high-low+1},(_,i)=>low+i).filter(m=>pcs.includes(m%12));

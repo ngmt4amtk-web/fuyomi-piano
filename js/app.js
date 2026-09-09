@@ -1,22 +1,22 @@
 import {
   LEVELS,
   makePhrase as defaultMakePhrase,
-} from './phrase.js?v=piano1';
+} from './phrase.js?v=piano2';
 import {
   TOL,
   createHolder as defaultCreateHolder,
   createMic as defaultCreateMic,
   detect as defaultDetect,
   judgeNote as defaultJudgeNote,
-} from './pitch.js?v=piano1';
+} from './pitch.js?v=piano2';
 import {
   KEYS,
   midiToStaff,
   mtof,
   noteLabel as noteNameJa,
-} from './theory.js';
-import { renderStaff as defaultRenderStaff, renderKeyboard, staffPosition } from './staff.js?v=piano1';
-import { COMPANIONS, renderCompanion } from './companion.js?v=piano1';
+} from './theory.js?v=piano2';
+import { renderStaff as defaultRenderStaff, renderKeyboard, staffPosition } from './staff.js?v=piano2';
+import { COMPANIONS, renderCompanion } from './companion.js?v=piano2';
 
 export function createFuyomiApp(dependencies = {}) {
 const window = dependencies.window ?? globalThis.window;
@@ -391,7 +391,7 @@ function updateLevelDescription() {
     chip.setAttribute('aria-pressed', String(kind === pickedCompanion));
   });
   const range = LEVELS[level];
-  elements.levelDescription.textContent = `${noteNameJa(range.low)}〜${noteNameJa(range.high)}。中央ドはド4。1音ずつ、ペダルを使わずに弾きます。`;
+  elements.levelDescription.textContent = `${noteNameJa(range.low)}〜${noteNameJa(range.high)}。中央ドは「普通のド」。1音ずつ、ペダルを使わずに弾きます。`;
 }
 
 function showScreen(name) {
@@ -926,7 +926,7 @@ function renderPractice() {
   const note=currentNote();const showHint=Boolean(note)&&state.hintStage>=1;
   elements.hintPanel.hidden=!showHint;
   if(showHint) {
-    elements.hintName.textContent=`音名 ${noteNameJa(note.midi)}（中央ドはド4）`;
+    elements.hintName.textContent=`音名 ${noteNameJa(note.midi)}（中央ドは「普通のド」）`;
     elements.hintFingering.hidden=state.hintStage<2;
     elements.hintFingering.innerHTML=state.hintStage>=2?renderKeyboard(note.midi):'';
   }
@@ -1273,12 +1273,12 @@ function renderResults() {
     const card = document.createElement('article');
     card.className = 'record-card';
     const title = document.createElement('h3');
-    title.textContent = `${record.phraseNumber}フレーズ目・${record.noteNumber}音目　${`${record.staff.clef === 'bass' ? '下段' : '上段'}・${staffPositionLabel(record.staff)}`}（${noteNameJa(record.midi)}）`;
+    title.textContent = `${record.phraseNumber}フレーズ目・${record.noteNumber}音目　${`${staffPositionLabel(record.staff)}`}（${noteNameJa(record.midi)}）`;
 
     const facts = document.createElement('dl');
     facts.className = 'record-facts';
     const rows = [
-      ['出題の譜面位置', `${record.staff.clef === 'bass' ? '下段' : '上段'}・${staffPositionLabel(record.staff)}`],
+      ['出題の譜面位置', `${staffPositionLabel(record.staff)}`],
       ['検出した音高', detectionSummary(record)],
       ['最初の発音まで', firstVoiceSummary(record)],
       ['やり直し回数', `${record.retries}回`],

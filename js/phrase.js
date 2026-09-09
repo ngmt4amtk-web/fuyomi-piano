@@ -1,11 +1,11 @@
-import {scaleMidis, midiToStaff} from './theory.js';
+import {scaleMidis, midiToStaff} from './theory.js?v=piano2';
 export const LEVELS = {
   1:{label:'中央ド〜ソ',low:60,high:67},
   2:{label:'1オクターブ',low:60,high:72},
-  3:{label:'少し高いソまで',low:60,high:79},
-  4:{label:'下のソも加える',low:55,high:79},
-  5:{label:'もっと高いドまで',low:55,high:84},
-  6:{label:'ソからソ・3オクターブ',low:55,high:91},
+  3:{label:'高いソまで',low:60,high:79},
+  4:{label:'低いソも加える',low:55,high:79},
+  5:{label:'すごく高いドまで',low:55,high:84},
+  6:{label:'低いソ〜すごく高いソ',low:55,high:91},
 };
 export function makePhrase({level,key='C',length=4,prev=null,rng=Math.random}) {
   const range=LEVELS[level];

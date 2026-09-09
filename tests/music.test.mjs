@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {LEVELS,makePhrase} from '../js/phrase.js';
-import {mtof,scaleMidis,KEYS} from '../js/theory.js';
+import {mtof,scaleMidis,KEYS,noteLabel} from '../js/theory.js';
 import {detect,judgeNote,TOL,createHolder} from '../js/pitch.js';
 import {renderStaff,staffPosition,renderKeyboard} from '../js/staff.js';
 const rngFor=seed=>()=>((seed=Math.imul(seed,1664525)+1013904223>>>0)/4294967296);
@@ -39,16 +39,16 @@ test('保持後の同じ残響は再合格せず、無声後は再判定する',
  for(let t=220;t<1000;t+=20)assert.equal(h.feed(t,tone),null);
  h.feed(1000,{f:-1,conf:0,rms:0});found=null;for(let t=1020;t<1240;t+=20)found=h.feed(t,tone)||found;assert.ok(found);
 });
-test('大譜表は中央ド・G3・G6を正しい段と位置に置く',()=>{
- assert.deepEqual([55,60,91].map(m=>{const p=staffPosition(m);return[p.clef,p.diatonic,p.y]}),[['bass',7,190],['treble',-2,132],['treble',16,24]]);
+test('ト音記号だけで中央ド・G3・G6を正しい位置に置く',()=>{
+ assert.deepEqual([55,60,91].map(m=>{const p=staffPosition(m);return[p.clef,p.diatonic,p.y]}),[['treble',-5,150],['treble',-2,132],['treble',16,24]]);
  const svg=renderStaff({notes:[55,60,84,91].map(midi=>({midi,state:'current'}))});
- assert.equal((svg.match(/data-role="staff-line"/g)||[]).length,10);
+ assert.equal((svg.match(/data-role="staff-line"/g)||[]).length,5);
  assert.equal((svg.match(/data-role="note"/g)||[]).length,4);
- assert.ok(!svg.includes('undefined'));assert.match(svg,/data-clef="bass"/);assert.match(svg,/data-midi="91"/);
+ assert.ok(!svg.includes('undefined'));assert.doesNotMatch(svg,/data-clef="bass"/);assert.match(svg,/data-midi="91"/);
 });
 test('鍵盤ヒントはオクターブと黒鍵を区別する',()=>{
  for(const midi of [55,60,61,72,91])assert.match(renderKeyboard(midi),/role="img"/);
- assert.notEqual(renderKeyboard(60),renderKeyboard(72));assert.match(renderKeyboard(61),/ド♯4/);
+ assert.notEqual(renderKeyboard(60),renderKeyboard(72));assert.match(renderKeyboard(61),/普通のド♯/);
 });
 test('ピアノの余韻中でも別音と同音の再打鍵を受け付ける',()=>{
  for(const changed of [true,false]) {
@@ -72,4 +72,12 @@ test('無音とランダムノイズを高い確信度の音と扱わない',()=
  assert.equal(detect(new Float32Array(2048),48000).f,-1);
  const rng=rngFor(91);
  for(let i=0;i<30;i++)assert.ok(detect(Float32Array.from({length:2048},()=>rng()*.3-.15),48000).conf<TOL.loose.conf);
+});
+
+test('音域の呼び名は数字を使わず境界で切り替わる',()=>{
+ assert.deepEqual([55,60,71,72,83,84,91].map(noteLabel),['低いソ','普通のド','普通のシ','高いド','高いシ','すごく高いド','すごく高いソ']);
+ for(let midi=55;midi<=91;midi++) {
+  assert.doesNotMatch(noteLabel(midi),/[0-9]/);
+  const pos=staffPosition(midi);assert.equal(pos.clef,'treble');assert.ok(pos.y>=24&&pos.y<=150);
+ }
 });
