@@ -1,4 +1,4 @@
-import {scaleMidis, midiToStaff} from './theory.js?v=piano2';
+import {scaleMidis, midiToStaff} from './theory.js?v=20260910-flats1';
 export const LEVELS = {
   1:{label:'中央ド〜ソ',low:60,high:67},
   2:{label:'1オクターブ',low:60,high:72},

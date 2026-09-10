@@ -1,24 +1,31 @@
 import {
   LEVELS,
   makePhrase as defaultMakePhrase,
-} from './phrase.js?v=piano2';
+} from './phrase.js?v=20260910-flats1';
 import {
   TOL,
   createHolder as defaultCreateHolder,
   createMic as defaultCreateMic,
   detect as defaultDetect,
   judgeNote as defaultJudgeNote,
-} from './pitch.js?v=piano2';
+} from './pitch.js?v=20260910-flats1';
 import {
   KEYS,
   midiToStaff,
   mtof,
-  noteLabel as noteNameJa,
-} from './theory.js?v=piano2';
-import { renderStaff as defaultRenderStaff, renderKeyboard, staffPosition } from './staff.js?v=piano2';
-import { COMPANIONS, renderCompanion } from './companion.js?v=piano2';
+  noteLabel as defaultNoteNameJa,
+} from './theory.js?v=20260910-flats1';
+import { renderStaff as defaultRenderStaff, renderKeyboard, staffPosition } from './staff.js?v=20260910-flats1';
+import { COMPANIONS, renderCompanion } from './companion.js?v=20260910-flats1';
 
 export function createFuyomiApp(dependencies = {}) {
+// 既存の音名APIは保ち、画面に出す異名同音を選択中の調に合わせる。
+function noteNameJa(midi) {
+  const label = defaultNoteNameJa(midi);
+  if (!KEYS[elements.keySelect.value]?.flats) return label;
+  return label.replace('ド♯','レ♭').replace('レ♯','ミ♭').replace('ファ♯','ソ♭').replace('ソ♯','ラ♭').replace('ラ♯','シ♭');
+}
+
 const window = dependencies.window ?? globalThis.window;
 const document = dependencies.document ?? globalThis.document;
 if (!window || !document) throw new TypeError('app の起動には window と document が必要です');
@@ -137,7 +144,7 @@ const companionChips = new Map(COMPANIONS.map(id => [id, byId(`companion-chip-${
  * 保存・URL上書き・講師リンクのdisabledは今までどおり select 側の仕組みに乗る。
  */
 const CHIP_GROUPS = [
-  { name: 'key', select: 'keySelect', values: ['C', 'G', 'D', 'A'] },
+  { name: 'key', select: 'keySelect', values: ['C', 'G', 'D', 'A', 'F', 'Bb', 'Eb'] },
   { name: 'hint', select: 'hintSelect', values: ['off', 'on'] },
   { name: 'timer', select: 'timerSelect', values: ['off', 'on'] },
 ];
@@ -225,7 +232,8 @@ function queryOverrides() {
     locked.add('level');
   }
 
-  const key = (params.get('key') || '').toUpperCase();
+  const requestedKey = (params.get('key') || '').toUpperCase();
+  const key = Object.keys(KEYS).find(candidate => candidate.toUpperCase() === requestedKey);
   if (params.has('key') && KEYS[key]) {
     overrides.key = key;
     locked.add('key');
@@ -928,7 +936,7 @@ function renderPractice() {
   if(showHint) {
     elements.hintName.textContent=`音名 ${noteNameJa(note.midi)}（中央ドは「普通のド」）`;
     elements.hintFingering.hidden=state.hintStage<2;
-    elements.hintFingering.innerHTML=state.hintStage>=2?renderKeyboard(note.midi):'';
+    elements.hintFingering.innerHTML=state.hintStage>=2?renderKeyboard(note.midi, state.config.key):'';
   }
 }
 
